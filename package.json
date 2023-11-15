@@ -1,0 +1,17 @@
+{
+  "name": "fireproof-playground",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Fireproof playground",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fireproof/core": "^0.14.2",
+    "bent": "^7.3.12"
+  }
+}
