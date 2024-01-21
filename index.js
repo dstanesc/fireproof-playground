@@ -1,4 +1,4 @@
-import { fireproof, Index } from '@fireproof/core/node';
+import { fireproof } from '@fireproof/core/node';
 import bent from 'bent';
 
 const getJSON = bent('json');
@@ -15,7 +15,7 @@ async function initialData() {
 }
 
 async function storeData(data) {
-    const db = fireproof('playground-enc');
+    const db = fireproof('playground-16d', {autoCompact: 10000});
 
     console.log("Database initial state", db._crdt.clock.head.toString());
 
@@ -30,59 +30,30 @@ async function storeData(data) {
     let count = 0;
     for (const item of data) {
         await db.put(item);
-        process.stdout.write(`${count++} - ${db._crdt.blocks.loader.carLog.length}      \r`)
+        process.stdout.write(`${count++} - ${db._crdt.blockstore.loader.carLog.length}      \r`)
     }
     return db;
 }
 
-async function indexData(db) {
-    const index = new Index(db._crdt, 'event_id', (doc) => {
-        return doc.id;
-    })
-    return index
-}
-
-async function queryIndex(index) {
-    // type QueryOpts = {
-    //     descending?: boolean
-    //     limit?: number
-    //     includeDocs?: boolean
-    //     range?: [IndexKey, IndexKey]
-    //     key?: DocFragment,
-    //     keys?: DocFragment[]
-    //     prefix?: DocFragment | [DocFragment]
-    //   }
-    // type IndexKey = [string, string] | string
-    // { key: '2489651045'}
-    const results = await index.query({ includeDocs: false, descending: true, range: ['2400000000', '2900000000'], limit: 3 });
-    return results;
-}
 
 async function queryData(db) {
     return await db.query("id", { descending: true, range: ['2400000000', '2900000000'], limit: 3 })
 }
 
 (async () => {
-    const start = Date.now();
+    console.time("fetch")
     const jsonData = await initialData();
-    const end = Date.now();
-    console.log("Fetched", jsonData.length, "entries in", end - start, " ms");
+    console.timeEnd("fetch")
+    
+    console.log("Fetched", jsonData.length, "entries");
+
+    console.time("store")
     const db = await storeData(jsonData);
-    const end2 = Date.now();
-    console.log("Data stored in the database in", end2 - end, " ms");
-    const index = await indexData(db);
-    const end3 = Date.now();
-    console.log("Data indexed in ", end3 - end2, "ms");
-    const results = await queryIndex(index);
-    const end4 = Date.now();
-    console.log("Index queried in", end4 - end3, "ms");
-    results.rows.forEach(row => {
-        // console.log(JSON.stringify(row, null, 2));
-    });
+    console.timeEnd("store")
+
+    console.time("query")
     const results2 = await queryData(db);
-    const end5 = Date.now();
-    console.log("Database queried in", end5 - end4, "ms");
-    results2.rows.forEach(row => {
-        // console.log(JSON.stringify(row, null, 2));
-    });
+    console.timeEnd("query")
+
+    console.log("Query results", results2.rows.length);
 })();
