@@ -15,9 +15,22 @@ async function initialData() {
 }
 
 async function storeData(data) {
-    const db = fireproof('playground', { public: true });
+    const db = fireproof('playground-enc');
+
+    console.log("Database initial state", db._crdt.clock.head.toString());
+
+    console.time("all docs")
+
+    const allDocs = await db.allDocs();
+
+    console.log("Database allDocs", allDocs.rows.length);
+
+    console.timeEnd("all docs")
+
+    let count = 0;
     for (const item of data) {
         await db.put(item);
+        process.stdout.write(`${count++} - ${db._crdt.blocks.loader.carLog.length}      \r`)
     }
     return db;
 }
