@@ -7,15 +7,15 @@ async function initialData() {
     // 64 KB, 20 entries
     // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/very-small-file.json')
     // 2.1 MB, 1000 entries
-    // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/small-file.json')
+    return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/small-file.json')
     // 9.3 MB, 4000 entries
-    return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/medium-file.json')
+    // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/medium-file.json')
     // 26 MB, 11000 entries
     // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/large-file.json')
 }
 
 async function storeData(data) {
-    const db = fireproof('playground-16d', {autoCompact: 10000});
+    const db = fireproof('playground-167c', {autoCompact: 10000});
 
     console.log("Database initial state", db._crdt.clock.head.toString());
 
@@ -27,11 +27,18 @@ async function storeData(data) {
 
     console.timeEnd("all docs")
 
-    let count = 0;
-    for (const item of data) {
-        await db.put(item);
-        process.stdout.write(`${count++} - ${db._crdt.blockstore.loader.carLog.length}      \r`)
+    // let count = 0;
+
+    const batchSize = 100;
+    for (let i = 0; i < data.length; i += batchSize) {
+        console.log(`log: ${i} - ${db._crdt.blockstore.loader.carLog.length}`)
+        const batch = data.slice(i, i + batchSize);
+        const ops = batch.map((item, j) => db.put(item));
+        console.time("batch"+i)
+        await Promise.all(ops);
+        console.timeEnd("batch"+i)
     }
+
     return db;
 }
 
