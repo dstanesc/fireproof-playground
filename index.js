@@ -9,9 +9,9 @@ async function initialData() {
     // 2.1 MB, 1000 entries
     // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/small-file.json')
     // 9.3 MB, 4000 entries
-    return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/medium-file.json')
+    // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/medium-file.json')
     // 26 MB, 11000 entries
-    // return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/large-file.json')
+    return await getJSON('https://raw.githubusercontent.com/dstanesc/test-json-data/main/data/large-file.json')
 }
 
 async function storeData(data) {
