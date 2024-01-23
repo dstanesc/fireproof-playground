@@ -15,7 +15,7 @@ async function initialData() {
 }
 
 async function storeData(data) {
-    const db = fireproof('playground-167'+Date.now(), {autoCompact: 10000});
+    const db = fireproof('playground-17-'+Date.now(), {autoCompact: 100000, public: true});
 
     console.log("Database initial state", db._crdt.clock.head.toString());
 
