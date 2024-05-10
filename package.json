@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fireproof/core": "^0.17.1",
+    "@fireproof/core": "^0.18.0",
     "bent": "^7.3.12"
   }
 }
